@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>App Storeへ移動中... | うちの子カルテ</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500&display=swap" rel="stylesheet">
+
+  <!-- Google Analytics 4 -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-1KWW9F9EJF"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-1KWW9F9EJF');
+  </script>
+
+  <style>
+    :root {
+      --base:   #F9F6F2;
+      --text:   #2C2420;
+      --muted:  #7A6E69;
+      --accent: #6B8F7C;
+      --border: #E8E0D8;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Zen Maru Gothic', sans-serif;
+      background: var(--base);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+      text-align: center;
+      line-height: 1.8;
+      -webkit-font-smoothing: antialiased;
+    }
+    .spinner {
+      width: 32px;
+      height: 32px;
+      border: 3px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      margin-bottom: 24px;
+      animation: spin 0.9s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    h1 {
+      font-size: 17px;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+      margin-bottom: 6px;
+    }
+    p {
+      font-size: 13px;
+      color: var(--muted);
+    }
+    p a {
+      color: var(--accent);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+  </style>
+</head>
+<body>
+  <div class="spinner" aria-hidden="true"></div>
+  <h1>App Storeへ移動中...</h1>
+  <p>自動で移動しない場合は <a id="fallback" href="#">こちら</a> をタップしてください。</p>
+
+  <script>
+    (function () {
+      // ─── 流用時はこのブロックだけ書き換える ─────────────
+      var APP_STORE_URL       = 'https://apps.apple.com/jp/app/id6760578238';
+      var GA_MEASUREMENT_ID   = 'G-1KWW9F9EJF';
+      var REDIRECT_TIMEOUT_MS = 1000;
+      // ────────────────────────────────────────────────
+
+      document.getElementById('fallback').href = APP_STORE_URL;
+
+      var params = new URLSearchParams(window.location.search);
+      var utm = {
+        utm_source:   params.get('utm_source')   || '(not set)',
+        utm_medium:   params.get('utm_medium')   || '(not set)',
+        utm_campaign: params.get('utm_campaign') || '(not set)',
+        utm_term:     params.get('utm_term')     || undefined,
+        utm_content:  params.get('utm_content')  || undefined
+      };
+
+      var redirected = false;
+      function redirect() {
+        if (redirected) return;
+        redirected = true;
+        window.location.replace(APP_STORE_URL);
+      }
+
+      // フォールバック:gtag が失敗しても必ず遷移
+      var timer = setTimeout(redirect, REDIRECT_TIMEOUT_MS);
+
+      try {
+        if (typeof gtag === 'function') {
+          gtag('event', 'app_store_redirect', Object.assign({}, utm, {
+            event_callback: function () {
+              clearTimeout(timer);
+              redirect();
+            },
+            event_timeout: REDIRECT_TIMEOUT_MS
+          }));
+        }
+      } catch (e) {
+        // 例外時はタイムアウトで遷移
+      }
+    })();
+  </script>
+</body>
+</html>
